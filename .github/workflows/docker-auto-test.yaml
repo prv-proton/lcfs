@@ -1,7 +1,7 @@
 name: Testing pipeline
 
 on:
-  pull_request:
+  push:
     branches:
       - '*'
 
