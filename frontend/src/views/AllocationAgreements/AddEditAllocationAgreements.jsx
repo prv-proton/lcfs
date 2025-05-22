@@ -205,7 +205,7 @@ export const AddEditAllocationAgreements = () => {
         compliancePeriod,
         isNewSupplementalEntry:
           isSupplemental && item.complianceReportId === +complianceReportId,
-        id: uuid()
+      id: item.id || uuid() // <--- Preserve existing id, or assign new if missing
       }))
 
       setRowData(updatedRowData)
