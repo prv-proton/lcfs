@@ -258,7 +258,8 @@ export const AddEditNotionalTransfers = () => {
           ...item,
           complianceReportId,
           isNewSupplementalEntry:
-            isSupplemental && item.complianceReportId === +complianceReportId
+          isSupplemental && item.complianceReportId === +complianceReportId,
+        id: item.id || uuid() // Explicitly preserve existing id, or assign new if missing
         })) ?? []
       setRowData(updatedRowData)
     } else {
