@@ -11,7 +11,7 @@ def test_answer_question_returns_human_friendly_message(tmp_path: Path) -> None:
         name="guide.pdf",
         text=(
             "Low Carbon Fuel Standard program guidance. Applicants submit quarterly "
-            "reports. Credits are issued after verification."
+            "reports. Credits are issued after verification. \x00\x01\x02"
         ),
     )
 
@@ -20,3 +20,4 @@ def test_answer_question_returns_human_friendly_message(tmp_path: Path) -> None:
     assert "here's what your documents say" in result["answer"].lower()
     assert "guide.pdf" in result["answer"].lower()
     assert result["sources"][0]["document_name"] == "guide.pdf"
+    assert "\x00" not in result["answer"]

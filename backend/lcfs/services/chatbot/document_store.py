@@ -12,13 +12,24 @@ from typing import Dict, Iterable, List, Optional
 from lcfs.settings import TEMP_DIR
 
 
+_CONTROL_RE = re.compile(r"[^\x09\x0a\x0d\x20-\x7E]")
+_WHITESPACE_RE = re.compile(r"\s+")
+
+
+def normalize_text(text: str) -> str:
+    cleaned = _CONTROL_RE.sub(" ", text)
+    cleaned = _WHITESPACE_RE.sub(" ", cleaned)
+    return cleaned.strip()
+
+
 def _tokenize(text: str) -> List[str]:
     normalized = re.sub(r"\s+", " ", text.lower()).strip()
     return re.findall(r"[a-z0-9']+", normalized)
 
 
 def _chunk_text(text: str, max_chars: int = 900) -> List[str]:
-    sentences = re.split(r"(?<=[.!?])\s+", text.strip())
+    normalized = normalize_text(text)
+    sentences = re.split(r"(?<=[.!?])\s+", normalized)
     chunks: List[str] = []
     current: List[str] = []
     length = 0
@@ -39,7 +50,7 @@ def _chunk_text(text: str, max_chars: int = 900) -> List[str]:
         chunks.append(" ".join(current).strip())
 
     if not chunks:
-        return [text.strip()]
+        return [normalized]
     return chunks
 
 

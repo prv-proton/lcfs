@@ -1,19 +1,47 @@
 from __future__ import annotations
 
 import re
+import zlib
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from lcfs.services.chatbot.document_store import DocumentStore
+from lcfs.services.chatbot.document_store import DocumentStore, normalize_text
 from lcfs.settings import TEMP_DIR
 
 
+_STREAM_RE = re.compile(rb"stream\r?\n(.*?)endstream", re.DOTALL)
+_PAREN_TEXT_RE = re.compile(rb"\(([^()]*)\)")
+
+
+def _extract_stream_text(file_bytes: bytes) -> str:
+    """Return readable text from compressed or plain PDF streams."""
+
+    snippets: List[str] = []
+    for match in _STREAM_RE.finditer(file_bytes):
+        stream_content = match.group(1)
+        try:
+            stream_content = zlib.decompress(stream_content)
+        except Exception:
+            # Not every stream is compressed; best-effort fallback keeps plaintext.
+            pass
+
+        for candidate in _PAREN_TEXT_RE.findall(stream_content):
+            snippets.append(candidate.decode("utf-8", errors="ignore"))
+
+    return normalize_text(" ".join(snippets))
+
+
 def extract_text_from_pdf(file_bytes: bytes) -> str:
+    stream_text = _extract_stream_text(file_bytes)
+    if stream_text:
+        return stream_text
+
     decoded = file_bytes.decode("latin-1", errors="ignore")
     text_candidates = re.findall(r"\(([^)]+)\)", decoded)
     if text_candidates:
-        return " ".join(text_candidates)
-    return re.sub(r"[^\w\s.,:;\-]", " ", decoded)
+        return normalize_text(" ".join(text_candidates))
+
+    return normalize_text(decoded)
 
 
 class ChatbotService:
