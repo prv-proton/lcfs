@@ -24,6 +24,7 @@ export const Navbar = () => {
     )
     const idirRoutes = [
       { name: t('Dashboard'), route: ROUTES.DASHBOARD },
+      { name: t('Chatbot'), route: ROUTES.CHATBOT },
       { name: t('Organizations'), route: ROUTES.ORGANIZATIONS.LIST },
       { name: t('Transactions'), route: ROUTES.TRANSACTIONS.LIST },
       { name: t('ComplianceReporting'), route: ROUTES.REPORTS.LIST },
@@ -35,6 +36,7 @@ export const Navbar = () => {
     ]
     const bceidRoutes = [
       { name: t('Dashboard'), route: ROUTES.DASHBOARD },
+      { name: t('Chatbot'), route: ROUTES.CHATBOT },
       { name: t('Transactions'), route: ROUTES.TRANSACTIONS.LIST },
       {
         name: t('ComplianceReporting'),

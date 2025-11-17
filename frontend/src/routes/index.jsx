@@ -16,6 +16,7 @@ import PublicLayout from '@/layouts/PublicLayout'
 import { fuelCodeRoutes } from './routeConfig/fuelCodeRoutes'
 import { publicPageRoutes } from './routeConfig/publicPageRoutes'
 import { PublicPageLayout } from '@/layouts/PublicPageLayout'
+import { chatbotRoutes } from './routeConfig/chatbotRoutes'
 
 const allRoutes = [
   ...publicRoutes,
@@ -27,7 +28,8 @@ const allRoutes = [
   ...transferRoutes,
   ...reportRoutes,
   ...notificationRoutes,
-  ...publicPageRoutes
+  ...publicPageRoutes,
+  ...chatbotRoutes
   // ... other route groups
 ]
 
