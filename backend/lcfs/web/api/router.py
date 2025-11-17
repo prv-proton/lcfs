@@ -5,6 +5,7 @@ from lcfs.web.api import (
     charging_equipment,
     charging_site,
     echo,
+    chatbot,
     fuel_supply,
     monitoring,
     user,
@@ -39,6 +40,7 @@ from lcfs.web.api import (
 api_router = APIRouter()
 api_router.include_router(monitoring.router)
 api_router.include_router(calculator.router, prefix="/calculator", tags=["public"])
+api_router.include_router(chatbot.router, prefix="/chatbot", tags=["chatbot"])
 api_router.include_router(
     allocation_agreement.router,
     prefix="/allocation-agreement",

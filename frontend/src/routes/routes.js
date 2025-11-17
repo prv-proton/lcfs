@@ -7,6 +7,7 @@ export const ROUTES = {
   API_DOCS: '/docs',
   CREDIT_CALCULATOR: '/credit-calculator',
   FILE_SUBMISSION: '/file-submissions',
+  CHATBOT: '/assistant',
 
   AUTH: {
     LOGIN: '/login',
