@@ -13,6 +13,34 @@ _STREAM_RE = re.compile(rb"stream\r?\n(.*?)endstream", re.DOTALL)
 _PAREN_TEXT_RE = re.compile(rb"\(([^()]*)\)")
 
 
+def _is_readable(snippet: str) -> bool:
+    """Heuristic to drop binary noise while keeping natural language."""
+
+    if not snippet or len(snippet.strip()) < 8:
+        return False
+
+    alpha_ratio = sum(ch.isalpha() for ch in snippet) / max(len(snippet), 1)
+    if alpha_ratio < 0.5:
+        return False
+
+    words = re.findall(r"[a-zA-Z]{3,}", snippet)
+    if not words:
+        return False
+
+    vowel_words = sum(1 for word in words if re.search(r"[aeiou]", word, re.I))
+    word_density = len(words) / max(len(snippet.split()), 1)
+    return vowel_words > 0 and word_density >= 0.3
+
+
+def _clean_snippets(snippets: List[str]) -> List[str]:
+    cleaned: List[str] = []
+    for raw in snippets:
+        normalized = normalize_text(raw)
+        if _is_readable(normalized):
+            cleaned.append(normalized)
+    return cleaned
+
+
 def _extract_stream_text(file_bytes: bytes) -> str:
     """Return readable text from compressed or plain PDF streams."""
 
@@ -28,7 +56,8 @@ def _extract_stream_text(file_bytes: bytes) -> str:
         for candidate in _PAREN_TEXT_RE.findall(stream_content):
             snippets.append(candidate.decode("utf-8", errors="ignore"))
 
-    return normalize_text(" ".join(snippets))
+    cleaned = _clean_snippets(snippets)
+    return normalize_text(" ".join(cleaned))
 
 
 def extract_text_from_pdf(file_bytes: bytes) -> str:
