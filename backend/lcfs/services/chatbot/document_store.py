@@ -43,6 +43,28 @@ def _chunk_text(text: str, max_chars: int = 900) -> List[str]:
     return chunks
 
 
+def _humanize_answer(best_match: Dict[str, object], matches: List[Dict[str, object]]) -> str:
+    snippet = str(best_match.get("snippet", "")).strip()
+    document_names = [match.get("document_name", "") for match in matches[:3] if match.get("document_name")]
+
+    if document_names:
+        unique_names = list(dict.fromkeys(document_names))
+        if len(unique_names) == 1:
+            sources_phrase = unique_names[0]
+        elif len(unique_names) == 2:
+            sources_phrase = " and ".join(unique_names)
+        else:
+            sources_phrase = ", ".join(unique_names[:-1]) + f", and {unique_names[-1]}"
+        prefix = f"Based on {sources_phrase}, here's what your documents say: "
+    else:
+        prefix = "Here's what your documents say: "
+
+    if not snippet:
+        return prefix.rstrip()
+
+    return f"{prefix}{snippet}"
+
+
 @dataclass
 class StoredDocument:
     document_id: str
@@ -172,7 +194,7 @@ class DocumentStore:
                 "sources": [],
             }
 
-        best_answer = matches[0]["snippet"]
+        best_answer = _humanize_answer(matches[0], matches)
         sources = [
             {
                 "document_id": match["document_id"],
